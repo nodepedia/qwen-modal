@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "modal-qwen": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Modal Qwen 3.8 27B",
+      "options": {
+        "baseURL": "MODAL_URL/v1",
+        "apiKey": "{env:QWEN_API_KEY}"
+      },
+      "models": {
+        "qwen38-27b-uncensored": { "name": "Qwen 3.8 27B Uncensored" }
+      }
+    }
+  },
+  "model": "modal-qwen/qwen38-27b-uncensored"
+}
