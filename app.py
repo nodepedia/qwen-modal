@@ -5,7 +5,7 @@ MODEL = "junafinity/Qwen-3.8-27B-Uncensored"
 SERVED = "qwen38-27b-uncensored"
 
 image = (
-    modal.Image.from_registry("vllm/vllm-openai:latest", add_python=None)
+    modal.Image.from_registry("vllm/vllm-openai:latest", add_python="3.12")
     .entrypoint([])
     .env({
         "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
