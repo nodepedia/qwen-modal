@@ -45,11 +45,17 @@ sed -i '/MODAL_URL/d' ~/.bashrc && echo 'export MODAL_URL="https://NAMAKAMU--qwe
 ## 5. Tes (request pertama = cold start, MULAI BAYAR GPU)
 Pertama kali lama (±10-20 menit: download 52GB ke volume + compile). Berikutnya lebih cepat karena bobot di-cache di volume `qwen38-cache`.
 ```bash
-curl -s --max-time 1800 $MODAL_URL/v1/chat/completions \
+# 1) Warm-up: tunggu sampai server siap (cold start). Tiap 15 detik cek, keluar saat 200.
+until [ "$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $QWEN_API_KEY" $MODAL_URL/v1/models)" = "200" ]; do echo "loading... $(date +%T)"; sleep 15; done; echo READY
+
+# 2) Chat
+curl -sSL --max-time 1800 -w "\nHTTP %{http_code}\n" $MODAL_URL/v1/chat/completions \
   -H "Authorization: Bearer $QWEN_API_KEY" -H "Content-Type: application/json" \
   -d '{"model":"qwen38-27b-uncensored","messages":[{"role":"user","content":"Halo"}],"max_tokens":200}'
 ```
-Sukses kalau ada `"choices"`.
+Sukses kalau `HTTP 200` dan ada `"choices"`.
+
+> **Kenapa kadang output kosong?** Request yang nunggu >150 detik (saat cold start) dibalas Modal dengan redirect `303` tanpa body. `curl -s` tanpa `-L` = layar kosong. Makanya pakai warm-up di atas + `-sSL -w`. Kalau dapat 401 = key beda dengan `modal secret`; 5xx = cek `modal app logs qwen38`.
 
 ## 6. Cek status & log
 ```bash
